@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:onlineapp/Models/productmodel.dart';
+import 'package:onlineapp/constants/constants.dart';
 import 'package:onlineapp/provider/cart_provider.dart';
+import 'package:onlineapp/view/Cart_screen.dart';
 import 'package:provider/provider.dart';
 
 class Home_Page extends StatelessWidget {
@@ -8,7 +10,8 @@ class Home_Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CartProvider>(context);
+    print('build full widget');
+    List<String> items = ['apple', 'mango', 'banana', 'orange', 'yellow'];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
@@ -17,39 +20,43 @@ class Home_Page extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-        actions: const [
-          Stack(
-            children: [
-              Icon(
-                Icons.local_grocery_store,
-                color: Colors.white,
-              ),
-            ],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CartScreen()));
+            },
+            icon: const Icon(
+              Icons.local_grocery_store,
+              color: Colors.white,
+            ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 20,
           )
         ],
       ),
-      body: Consumer<CartProvider>(
-        builder: (context, value, child) => ListView.builder(
-          itemCount: value.products.length,
+      body: Consumer<CartProvider>(builder: (ctx, value, child) {
+        return ListView.builder(
+          itemCount: items.length,
           itemBuilder: (BuildContext context, int index) {
+            final item = items[index];
+            final isfav = ctx.watch<CartProvider>().fav(item as String);
             return ListTile(
                 onTap: () {},
-                leading: Icon(Icons.add),
-                title: Text('Products'),
+                leading: Icon(Icons.abc),
+                title: Text(item),
                 trailing: IconButton(
                     onPressed: () {
-                      value.fexiblebutton();
-                      value.set_addfav(Productmodel as Productmodel);
+                      ctx.read<CartProvider>().fexiblebutton(item);
                     },
-                    icon: Icon(value.isfav
-                        ? Icons.favorite
-                        : Icons.favorite_border_outlined)));
+                    icon: Icon(
+                      isfav ? Icons.favorite : Icons.favorite_border_outlined,
+                      color: isfav ? Colors.red : Colors.grey,
+                    )));
           },
-        ),
-      ),
+        );
+      }),
     );
   }
 }
